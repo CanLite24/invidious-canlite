@@ -1,3 +1,10 @@
+<!-- Video.js CSS & JS and IMA SDK libraries -->
+<link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet">
+<script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+<script src="https://imasdk.googleapis.com/js/sdkloader/ima3.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-ads/6.6.4/videojs.ads.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-ima/1.8.0/videojs.ima.min.js"></script>
+
 <video style="outline:none;width:100%;background-color:#000" playsinline poster="<%= thumbnail %>"
     id="player" class="on-video_player video-js player-style-<%= params.player_style %>"
     preload="<% if params.preload %>auto<% else %>none<% end %>"
@@ -13,7 +20,7 @@
                best_m4a_stream_bitrate = 0
                audio_streams.each_with_index do |fmt, i|
                  bandwidth = fmt["bitrate"].as_i
-                 if (fmt["mimeType"].as_s.starts_with?("audio/mp4") && bandwidth > best_m4a_stream_bitrate)
+                 if (fmt["mimeType"].as_s.startsWith("audio/mp4") && bandwidth > best_m4a_stream_bitrate)
                    best_m4a_stream_bitrate = bandwidth
                    best_m4a_stream_index = i
                  end
@@ -86,4 +93,45 @@
 }.to_pretty_json
 %>
 </script>
+
+<!-- VAST 3.0 Pre-Roll Ad Integration using IMA SDK -->
+<script>
+  // Initialize Video.js with the IMA plugin on the existing player element.
+  var player = videojs('player');
+  
+  // Configure the IMA plugin with your VAST 3.0 ad tag.
+  player.ima({
+    adTagUrl: 'https://juhevomu.com/dAmfF.zkdYGCN/vuZ/GoUH/seGmr9cuBZFUxlhk/PzTcYAyPMgDwcj3tMLDvg-toNQjnIzwoNIzzcdwMOFS/Z/s/awWN1Dp/dTDJ0dx-',
+    debug: true,
+    adWillAutoSkip: false, // Require user interaction to skip.
+    timeout: 5000,
+    prerollTimeout: 10000
+  });
+  
+  // When the player is ready, initialize the ad container and request the ads.
+  player.ready(function() {
+    player.ima.initializeAdDisplayContainer();
+    player.ima.requestAds();
+  });
+  
+  // Listen for ad events.
+  player.on('ads-ad-skipped', function() {
+    console.log('Ad skipped by the user.');
+  });
+  player.on('ads-ad-ended', function() {
+    console.log('Ad ended.');
+  });
+  
+  // Fallback: If there's an error loading the ad, play the main video.
+  player.on('ads-error', function() {
+    console.log('Ad error encountered, proceeding to play the main video.');
+    player.play();
+  });
+  
+  // Ensure the main video plays after the ad ends.
+  player.on('ads-ad-end', function() {
+    player.play();
+  });
+</script>
+
 <script src="/js/player.js?v=<%= ASSET_COMMIT %>"></script>
