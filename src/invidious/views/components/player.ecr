@@ -20,7 +20,7 @@
                best_m4a_stream_bitrate = 0
                audio_streams.each_with_index do |fmt, i|
                  bandwidth = fmt["bitrate"].as_i
-                 if (fmt["mimeType"].as_s.startsWith("audio/mp4") && bandwidth > best_m4a_stream_bitrate)
+                 if (fmt["mimeType"].as_s.starts_with?("audio/mp4") && bandwidth > best_m4a_stream_bitrate)
                    best_m4a_stream_bitrate = bandwidth
                    best_m4a_stream_index = i
                  end
